@@ -19,7 +19,10 @@ requests == 2.24.0
 streamlit == 0.69.2
 
 # back-plt/getData.py: 6,7
-yahoo_finance_api2 == 0.0.9
+#yahoo_finance_api2 == 0.0.9
 
 # back-plt/main.py: 12
 yfinance == 0.1.54
+
+#pyngrok-4.2.2
+pyngrok == 4.2.2
