@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import streamlit as st
+import base64
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
@@ -21,8 +22,9 @@ st.beta_set_page_config(page_title='Back-plt', page_icon=None, layout='centered'
 
 st.write("""
 # Simple backtrader backtesting App
-After choosing each parameter press enter.
-period need to be grater than 1h if the date range is greaer than 60 days
+* After choosing each parameter press enter.
+* Interval length need to be grater than 1h if the date range is greaer than 60 days
+* After the chart loads the side bar will load with the bactested data, click on it to download
 """ )
 
 # tickerSymbol =  'RELIANCE.NS'
@@ -36,9 +38,21 @@ start_date = st.text_input("Enter Start Date", '2020-09-20')
 end_date = st.text_input("Enter End Date", '2020-10-18') 
 interval_length = st.text_input("Enter Interval length (1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo)", '5m') 
 start_cash = st.text_input("Enter starting Cash", '100000.0') 
+tickerData = yf.Ticker(tickerSymbol)
+#get the historical prices for this ticker
+tickerDf = tickerData.history(interval=interval_length, start=start_date, end=end_date)
+# Open	High	Low	Close	Volume	Dividends	Stock Splits
 
+st.write("""
+## Closing Price
+""")
+st.line_chart(tickerDf.Close)
+st.write("""
+## Volume Price
+""")
+st.line_chart(tickerDf.Volume)
 
-def runStrategy(tickerSymbol,start_date,end_date,interval_length,start_cash):
+def runStrategy(tickerSymbol,tickerDf,start_cash):
     fname = 'out/'
     cerebro = bt.Cerebro()
     cerebro.broker.setcash(float(start_cash))
@@ -47,10 +61,7 @@ def runStrategy(tickerSymbol,start_date,end_date,interval_length,start_cash):
     #cerebro.addobserver(bt.observers.Trade)
     #cerebro.addobserver(bt.observers.BuySell)
     cerebro.broker.setcommission(commission=0.0001)
-    tickerData = yf.Ticker(tickerSymbol)
-    #get the historical prices for this ticker
-    tickerDf = tickerData.history(interval=interval_length, start=start_date, end=end_date)
-    # Open	High	Low	Close	Volume	Dividends	Stock Splits
+
 
     print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
     cerebro.addstrategy(TestStrategy)
@@ -60,13 +71,22 @@ def runStrategy(tickerSymbol,start_date,end_date,interval_length,start_cash):
 
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
     #cerebro.plot(style='candlestick', barup='green', bardown='red')
-    fname += datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+    file_name = tickerSymbol + '-'+datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+    fname += file_name
 
-    p = BacktraderPlotting(style='bar',filename=fname+'.html', output_mode='show', scheme=Tradimo())
+    p = BacktraderPlotting(style='bar',filename=fname+'.html', output_mode='save', scheme=Tradimo())
     cerebro.plot(p)
     print("saved at "+fname+'.html')
+    return [fname+'.html', file_name]
 
-runStrategy(tickerSymbol,start_date,end_date,interval_length,start_cash)
+file_path,filename = runStrategy(tickerSymbol,tickerDf,start_cash)
+with open(file_path) as f:
+    bytes = f.read()
+    b64 = base64.b64encode(bytes.encode("utf-8")).decode()
+    href = f'<a href="data:file/html;base64,{b64}" download=\'{filename}.html\'>\
+        Backtesting done, Click to download\
+    </a>'
+st.sidebar.markdown(href, unsafe_allow_html=True)    
 # port = os.environ.get("PORT", 1441)
 
 # server_address = ("", port)
