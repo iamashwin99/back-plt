@@ -5,7 +5,8 @@
 backtrader == 1.9.76.123
 
 # back-plt/main.py: 10,11
-btplotting == 0.1.0
+#btplotting == 0.1.0
+git+git://github.com/happydasch/btplotting
 
 # back-plt/getData.py: 12
 # back-plt/strategy.py: 12
