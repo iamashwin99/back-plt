@@ -3,28 +3,40 @@ from __future__ import (absolute_import, division, print_function,
 import streamlit as st
 import base64
 import datetime  # For datetime objects
-import os.path  # To manage paths
-import sys  # To find out the script name (in argv[0])
-#from getData import *
+import os  # To manage paths
+import io
 import backtrader as bt
-from strategy import TestStrategy
+#from strategy import TestStrategy
 from btplotting import BacktraderPlotting
 from btplotting.schemes import Tradimo
 import yfinance as yf
-#from pyngrok import ngrok
-#from http.server import HTTPServer, BaseHTTPRequestHandler
+import backtrader.feeds as btfeeds
+import pandas as pd
+from streamlit_ace import st_ace
+import random, string
+import importlib
 st.beta_set_page_config(page_title='Back-plt', page_icon=None, layout='centered', initial_sidebar_state='auto')
-# Open a HTTP tunnel on the default port 80
-# ngrok.set_auth_token("1j3WOfmAFSipl5hDPeA5NWH79jx_rt1BbRvQQC9Gee1FtiGH")
-# public_url = ngrok.connect()
-# Open a SSH tunnel
-#ssh_url = ngrok.connect(22, "tcp")
+LANGUAGES = [
+     "python",
+]
+THEMES = [
+    "ambiance", "chaos", "chrome", "clouds", "clouds_midnight", "cobalt", "crimson_editor", "dawn",
+    "dracula", "dreamweaver", "eclipse", "github", "gob", "gruvbox", "idle_fingers", "iplastic",
+    "katzenmilch", "kr_theme", "kuroir", "merbivore", "merbivore_soft", "mono_industrial", "monokai",
+    "nord_dark", "pastel_on_dark", "solarized_dark", "solarized_light", "sqlserver", "terminal",
+    "textmate", "tomorrow", "tomorrow_night", "tomorrow_night_blue", "tomorrow_night_bright",
+    "tomorrow_night_eighties", "twilight", "vibrant_ink", "xcode"
+]
+
+KEYBINDINGS = [
+    "vscode", "emacs", "sublime", "vim"
+]
 
 st.write("""
 # Simple backtrader backtesting App
 * After choosing each parameter press enter.
-* Interval length need to be grater than 1h if the date range is greaer than 60 days
-* After the chart loads the side bar will load with the bactested data, click on it to download
+* Interval length need to be grater than 1h if the date range is greater than 60 days
+* After the chart loads the side bar will load with the backtested data, click on it to download
 """ )
 
 # tickerSymbol =  'RELIANCE.NS'
@@ -52,14 +64,36 @@ st.write("""
 """)
 st.line_chart(tickerDf.Volume)
 
+st.sidebar.title(":memo: Editor settings")
+with io.open('strategy.py', 'r', encoding='utf8') as f:
+    text = f.read()
+
+content = st_ace(
+    value=text,
+    language=st.sidebar.selectbox("Language mode", options=LANGUAGES),
+    theme=st.sidebar.selectbox("Theme", options=THEMES),
+    keybinding=st.sidebar.selectbox("Keybinding mode", options=KEYBINDINGS),
+    font_size=st.sidebar.slider("Font size", 5, 24, 12),
+    tab_size=st.sidebar.slider("Tab size", 1, 8, 4),
+    show_gutter=st.sidebar.checkbox("Show gutter", value=True),
+    show_print_margin=st.sidebar.checkbox("Show print margin", value=True),
+    wrap=st.sidebar.checkbox("Wrap enabled", value=False),
+    readonly=st.sidebar.checkbox("Read-only", value=False, key="ace-editor"),
+    auto_update=st.sidebar.checkbox("Auto update", value=False),
+    key="ace-editor"
+)
+#exec(content)
+strategy_name = ''.join(random.choices(string.ascii_letters + string.digits, k=8)) 
+with open(strategy_name+'.py', 'w') as the_file:
+    the_file.write(content)
+
+TestStrategy = getattr(importlib.import_module(strategy_name), 'TestStrategy')
+
 def runStrategy(tickerSymbol,tickerDf,start_cash):
     fname = 'out/'
     cerebro = bt.Cerebro()
     cerebro.broker.setcash(float(start_cash))
-    #cerebro.addobserver(bt.observers.Cash)
     cerebro.addobserver(bt.observers.Value)
-    #cerebro.addobserver(bt.observers.Trade)
-    #cerebro.addobserver(bt.observers.BuySell)
     cerebro.broker.setcommission(commission=0.0001)
 
 
@@ -86,22 +120,11 @@ with open(file_path) as f:
     href = f'<a href="data:file/html;base64,{b64}" download=\'{filename}.html\'>\
         Backtesting done, Click to download\
     </a>'
-st.sidebar.markdown(href, unsafe_allow_html=True)    
-# port = os.environ.get("PORT", 1441)
-
-# server_address = ("", port)
-# httpd = HTTPServer(server_address, BaseHTTPRequestHandler)
-
-# public_url = ngrok.connect(port)
-# print("ngrok tunnel \"{}\" -> \"http://127.0.0.1:{}\"".format(public_url, port))
-
-# try:
-#     # Block until CTRL-C or some other terminating event
-#     httpd.serve_forever()
-# except KeyboardInterrupt:
-#    print(" Shutting down server.")
-
-#    httpd.socket.close()
-# st.write("""
-# # Done running, open link:
-# """ + public_url)
+st.sidebar.markdown(href, unsafe_allow_html=True)   
+st.write("""
+## <-- Backtesting done, download the file from the sidebar
+""")
+if os.path.exists(strategy_name+'.py'):
+  os.remove(strategy_name+'.py')
+else:
+  print("The file does not exist")
