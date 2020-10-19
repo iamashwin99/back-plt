@@ -11,8 +11,8 @@ from strategy import TestStrategy
 from btplotting import BacktraderPlotting
 from btplotting.schemes import Tradimo
 import yfinance as yf
-from pyngrok import ngrok
-from http.server import HTTPServer, BaseHTTPRequestHandler
+#from pyngrok import ngrok
+#from http.server import HTTPServer, BaseHTTPRequestHandler
 st.beta_set_page_config(page_title='Back-plt', page_icon=None, layout='centered', initial_sidebar_state='auto')
 # Open a HTTP tunnel on the default port 80
 # ngrok.set_auth_token("1j3WOfmAFSipl5hDPeA5NWH79jx_rt1BbRvQQC9Gee1FtiGH")
