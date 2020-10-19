@@ -17,6 +17,36 @@ import random, string
 import importlib
 st.beta_set_page_config(page_title='Back-plt', page_icon=None, layout='centered', initial_sidebar_state='auto')
 
+def runStrategy(tickerSymbol,tickerDf,start_cash):
+    fname = 'out/' 
+    cerebro = bt.Cerebro()
+    cerebro.broker.setcash(float(start_cash))
+    cerebro.addobserver(bt.observers.Value)
+    cerebro.broker.setcommission(commission=0.0001)
+    st.sidebar.write(''' ### Strategy output''')
+    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    cerebro.addstrategy(TestStrategy)
+    cerebro.adddata(bt.feeds.PandasData(dataname=tickerDf))
+    cerebro.addanalyzer(bt.analyzers.SharpeRatio)
+    cerebro.run()
+    
+    st.write('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    st.write('Strategy performance: %.3f percent' % ((cerebro.broker.getvalue()- float(start_cash))*100/float(start_cash)) )
+    st.write('Stock performance: %.3f percent' % ((((tickerDf['Open'][-1]) - (tickerDf['Open'][0]))/(tickerDf['Open'][0])).astype('float')*100))
+    
+    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    
+    #cerebro.plot(style='candlestick', barup='green', bardown='red')
+    file_name = tickerSymbol + '-'+datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+    fname += file_name
+
+    p = BacktraderPlotting(style='bar',filename=fname+'.html', output_mode='save', scheme=Tradimo())
+    cerebro.plot(p)
+    print("saved at "+fname+'.html')
+    return [fname+'.html', file_name]
+
+
+
 
 THEMES = [
     "chaos","ambiance",  "chrome", "clouds", "clouds_midnight", "cobalt", "crimson_editor", "dawn",
@@ -62,7 +92,7 @@ tickerData = yf.Ticker(tickerSymbol)
 #get the historical prices for this ticker
 tickerDf = tickerData.history(interval=interval_length, start=start_date, end=end_date)
 # Open	High	Low	Close	Volume	Dividends	Stock Splits
-
+#Charting the price and volume
 st.write("""
 ## Closing Price
 """)
@@ -72,10 +102,12 @@ st.write("""
 """)
 st.line_chart(tickerDf.Volume)
 
-st.sidebar.title(":memo: Editor settings")
+#load default strategy
+
+# Add ace and sliders
 with io.open('strategy.py', 'r', encoding='utf8') as f:
     text = f.read()
-
+st.sidebar.title(":memo: Editor settings")
 content = st_ace(
     value=text,
     language="python",
@@ -91,51 +123,35 @@ content = st_ace(
     key="ace-editor" 
     
 )
-#exec(content)
-strategy_name = ''.join(random.choices(string.ascii_letters + string.digits, k=8)) 
+#save content into temporary py and load its strategy
+strategy_name = 'temp-'+''.join(random.choices(string.ascii_letters + string.digits, k=8)) 
 with open(strategy_name+'.py', 'w') as the_file:
     the_file.write(content)
 
 TestStrategy = getattr(importlib.import_module(strategy_name), 'TestStrategy')
 
-def runStrategy(tickerSymbol,tickerDf,start_cash):
-    fname = 'out/'
-    cerebro = bt.Cerebro()
-    cerebro.broker.setcash(float(start_cash))
-    cerebro.addobserver(bt.observers.Value)
-    cerebro.broker.setcommission(commission=0.0001)
-
-
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
-    cerebro.addstrategy(TestStrategy)
-    cerebro.adddata(bt.feeds.PandasData(dataname=tickerDf))
-    cerebro.addanalyzer(bt.analyzers.SharpeRatio)
-    cerebro.run()
-    st.write('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-    #cerebro.plot(style='candlestick', barup='green', bardown='red')
-    file_name = tickerSymbol + '-'+datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
-    fname += file_name
-
-    p = BacktraderPlotting(style='bar',filename=fname+'.html', output_mode='save', scheme=Tradimo())
-    cerebro.plot(p)
-    print("saved at "+fname+'.html')
-    return [fname+'.html', file_name]
-
+### Run strategy
 file_path,filename = runStrategy(tickerSymbol,tickerDf,start_cash)
+
+###Downlaod strategy
 with open(file_path) as f:
     bytes = f.read()
     b64 = base64.b64encode(bytes.encode("utf-8")).decode()
     href = f'<a href="data:file/html;base64,{b64}" download=\'{filename}.html\'>\
-        Backtesting done, Click to download\
+       Click to download \
     </a>'
-st.sidebar.markdown(href, unsafe_allow_html=True)   
-st.write("""
-## <-- Backtesting done, download the file from the sidebar
-""")
+st.write(''' ## Backtesting done ''')
+st.markdown(href, unsafe_allow_html=True)   
+
+
+## Remove temporary files
 if os.path.exists(strategy_name+'.py'):
   os.remove(strategy_name+'.py')
   print("File Removed : "+strategy_name+'.py')
 else:
   print("The file does not exist")
+
+
+
+
+

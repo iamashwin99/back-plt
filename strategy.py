@@ -10,7 +10,7 @@ import backtrader as bt
 import backtrader.feeds as btfeeds
 
 import pandas as pd
-
+import streamlit as st
 
 # Create a Stratey
 
@@ -34,6 +34,7 @@ class TestStrategy(bt.Strategy):
         dt = dt or self.datas[0].datetime.date(0)
         #print('%s, %s' % (dt.isoformat(), txt))
         print('%s,%s, %s' % (dt.strftime("%d/%m/%Y"),self.datas[0].datetime.time().strftime("%H:%M:%S") ,txt))
+        st.sidebar.write('%s,%s, %s' % (dt.strftime("%d/%m/%Y"),self.datas[0].datetime.time().strftime("%H:%M:%S") ,txt))
 
     def __init__(self):
         # Keep a reference to the "close" line in the data[0] dataseries
