@@ -85,8 +85,9 @@ e_date = st.date_input('Enter End Date', datetime.datetime.now())
 start_date = s_date.strftime("%Y-%m-%d")
 end_date = e_date.strftime("%Y-%m-%d")
 
-
-interval_length = st.text_input("Enter Interval length (1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo)", '5m') 
+interval_length = st.selectbox(
+        "Select Interval", options=['1m','2m','5m','15m','30m','60m','90m','1h','1d','5d','1wk','1mo','3mo'], index=2  # pylint: disable=protected-access
+    )
 start_cash = st.text_input("Enter starting Cash", '100000.0') 
 tickerData = yf.Ticker(tickerSymbol)
 #get the historical prices for this ticker
