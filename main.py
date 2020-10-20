@@ -137,6 +137,7 @@ file_path,filename = runStrategy(tickerSymbol,tickerDf,start_cash)
 ###Downlaod strategy
 with open(file_path) as f:
     bytes = f.read()
+    st.components.v1.html(bytes, width=1300, height=2000, scrolling=True)
     b64 = base64.b64encode(bytes.encode("utf-8")).decode()
     href = f'<a href="data:file/html;base64,{b64}" download=\'{filename}.html\'>\
        Click to download \
