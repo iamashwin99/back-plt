@@ -31,4 +31,9 @@ streamlit_ace == 0.0.3
 yfinance == 0.1.54
 
 # Talib
-ta-lib == 0.4.19
+# ta-lib == 0.4.19
+#Add this one to your app's buildpack list: https://github.com/numrut/heroku-buildpack-python-talib
+
+#It should be placed after heroku/python.
+
+#And remove TA-Lib from your requirements.txt if it is already there.
