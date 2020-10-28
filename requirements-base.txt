@@ -29,3 +29,6 @@ streamlit_ace == 0.0.3
 
 # back-plt/main.py: 13
 yfinance == 0.1.54
+
+# Talib
+ta-lib == 0.4.19
