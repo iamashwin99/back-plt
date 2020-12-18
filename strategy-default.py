@@ -14,18 +14,13 @@ import streamlit as st
 
 # Create a Stratey
 
+# Actual logic is implimneted at def next:
+
 class TestStrategy(bt.Strategy):
     params = (('p1', 8), 
     ('p2', 21),
     ('p3', 55),
-    ('p4', 144),
     ('rsi', 40),
-    ('rr', 2),
-    ('rrp', 1),
-    ('candleper', 0.005),
-    ('delay', -1),
-    ('pricelimitper', 0.001),
-    ('bodyper', 0.7),
     )
     
 
@@ -56,7 +51,7 @@ class TestStrategy(bt.Strategy):
         self.sma1 = bt.indicators.EMA(period=self.p.p1)
         self.sma2 = bt.indicators.EMA(period=self.p.p2)
         self.sma3 = bt.indicators.EMA(period=self.p.p3)
-        self.sma4 = bt.indicators.EMA(period=self.p.p4)
+        
         self.rsi = bt.indicators.RSI(self.datas[0],plothlines=[55, 45])
         #self.vwap = bt.indicators.VWAP(self.datas[0])
 
