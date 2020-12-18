@@ -69,77 +69,76 @@ st.write("""
 """ )
 
 st.write('# Parameters')
-parameters = st.beta_container()
-
-with parameters:
-    display,plot= st.beta_columns(2)
 
 
-    with display:
-        tickerSymbol = st.text_input("Enter Symbol (like INFY.NS) ", 'RELIANCE.NS') 
-        # start_date = st.text_input("Enter Start Date", '2020-09-20') 
-        # end_date = st.text_input("Enter End Date", '2020-10-18') 
-        deltaDays = st.text_input("Enter delta days", '30') 
-        s_date = st.date_input('Enter Start Date (takes precedence over delta days)', datetime.datetime.now()-datetime.timedelta(days = int(deltaDays)) )
-        e_date = st.date_input('Enter End Date', datetime.datetime.now())
+display,plot= st.beta_columns(2)
 
-        start_date = s_date.strftime("%Y-%m-%d")
-        end_date = e_date.strftime("%Y-%m-%d")
 
-        interval_length = st.selectbox(
-                "Select Interval", options=['1m','2m','5m','15m','30m','60m','90m','1h','1d','5d','1wk','1mo','3mo'], index=2  # pylint: disable=protected-access
-            )
-        start_cash = st.text_input("Enter starting Cash", '100000.0') 
-        tickerData = yf.Ticker(tickerSymbol)
-        #get the historical prices for this ticker
-        tickerDf = tickerData.history(interval=interval_length, start=start_date, end=end_date)
-        # Open	High	Low	Close	Volume	Dividends	Stock Splits
-        #Charting the price and volume
-    with plot:
-        st.write("""
-        ## Closing Price Plot
-        """)
-        st.line_chart(tickerDf.Close)
-        st.write("""
-        ## Volume Plot
-        """)
-        st.line_chart(tickerDf.Volume)
+with display:
+    tickerSymbol = st.text_input("Enter Symbol (like INFY.NS) ", 'RELIANCE.NS') 
+    # start_date = st.text_input("Enter Start Date", '2020-09-20') 
+    # end_date = st.text_input("Enter End Date", '2020-10-18') 
+    deltaDays = st.text_input("Enter delta days", '30') 
+    s_date = st.date_input('Enter Start Date (takes precedence over delta days)', datetime.datetime.now()-datetime.timedelta(days = int(deltaDays)) )
+    e_date = st.date_input('Enter End Date', datetime.datetime.now())
+
+    start_date = s_date.strftime("%Y-%m-%d")
+    end_date = e_date.strftime("%Y-%m-%d")
+
+    interval_length = st.selectbox(
+            "Select Interval", options=['1m','2m','5m','15m','30m','60m','90m','1h','1d','5d','1wk','1mo','3mo'], index=2  # pylint: disable=protected-access
+        )
+    start_cash = st.text_input("Enter starting Cash", '100000.0') 
+    tickerData = yf.Ticker(tickerSymbol)
+    #get the historical prices for this ticker
+    tickerDf = tickerData.history(interval=interval_length, start=start_date, end=end_date)
+    # Open	High	Low	Close	Volume	Dividends	Stock Splits
+    #Charting the price and volume
+with plot:
+    st.write("""
+    ## Closing Price Plot
+    """)
+    st.line_chart(tickerDf.Close)
+    st.write("""
+    ## Volume Plot
+    """)
+    st.line_chart(tickerDf.Volume)
 
 #load default strategy
 st.write('# Code and Output')
-codenout = st.beta_container()
 
-with codenout:
-    
-    # Add ace and sliders
-    
-    st.write('### Code editor')
-    with io.open('strategy-default.py', 'r', encoding='utf8') as f:
-        text = f.read()
-    st.sidebar.title(":memo: Editor settings")
-    st.write('Hit `CTRL+ENTER` to retest')
-    st.write('*Remember to save your code separately!*')
-    content = st_ace(
-        height=1000,
-        value=text,
-        language="python",
-        theme=st.sidebar.selectbox("Theme", options=THEMES, index=6),
-        keybinding=st.sidebar.selectbox("Keybinding mode", options=KEYBINDINGS, index=3),
-        font_size=st.sidebar.slider("Font size", 5, 24, 15),
-        tab_size=4,
-        show_gutter=st.sidebar.checkbox("Show gutter", value=True),
-        show_print_margin=st.sidebar.checkbox("Show print margin", value=True),
-        wrap=st.sidebar.checkbox("Wrap enabled", value=True),
-        readonly=st.sidebar.checkbox("Read-only", value=False, key="ace-editor"),
-        auto_update=False,
-        key="ace-editor" 
-        
-    )
 
-    #save content into temporary py and load its strategy
-    strategy_name = 'temp-'+''.join(random.choices(string.ascii_letters + string.digits, k=8)) 
-    with open(strategy_name+'.py', 'w') as the_file:
-        the_file.write(content)
+
+
+# Add ace and sliders
+
+st.write('### Code editor')
+with io.open('strategy-default.py', 'r', encoding='utf8') as f:
+    text = f.read()
+st.sidebar.title(":memo: Editor settings")
+st.write('Hit `CTRL+ENTER` to retest')
+st.write('*Remember to save your code separately!*')
+content = st_ace(
+    height=1000,
+    value=text,
+    language="python",
+    theme=st.sidebar.selectbox("Theme", options=THEMES, index=6),
+    keybinding=st.sidebar.selectbox("Keybinding mode", options=KEYBINDINGS, index=3),
+    font_size=st.sidebar.slider("Font size", 5, 24, 15),
+    tab_size=4,
+    show_gutter=st.sidebar.checkbox("Show gutter", value=True),
+    show_print_margin=st.sidebar.checkbox("Show print margin", value=True),
+    wrap=st.sidebar.checkbox("Wrap enabled", value=True),
+    readonly=st.sidebar.checkbox("Read-only", value=False, key="ace-editor"),
+    auto_update=False,
+    key="ace-editor" 
+    
+)
+
+#save content into temporary py and load its strategy
+strategy_name = 'temp-'+''.join(random.choices(string.ascii_letters + string.digits, k=8)) 
+with open(strategy_name+'.py', 'w') as the_file:
+    the_file.write(content)
 
 TestStrategy = getattr(importlib.import_module(strategy_name), 'TestStrategy')
 

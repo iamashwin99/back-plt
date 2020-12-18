@@ -19,7 +19,6 @@ import streamlit as st
 class TestStrategy(bt.Strategy):
     params = (('p1', 8), 
     ('p2', 21),
-    ('p3', 55),
     ('rsi', 40),
     )
     
@@ -50,7 +49,6 @@ class TestStrategy(bt.Strategy):
         # Add a MovingAverageSimple indicator
         self.sma1 = bt.indicators.EMA(period=self.p.p1)
         self.sma2 = bt.indicators.EMA(period=self.p.p2)
-        self.sma3 = bt.indicators.EMA(period=self.p.p3)
         
         self.rsi = bt.indicators.RSI(self.datas[0],plothlines=[55, 45])
         #self.vwap = bt.indicators.VWAP(self.datas[0])

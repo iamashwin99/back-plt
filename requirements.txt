@@ -19,10 +19,10 @@ pandas == 1.0.5
 requests == 2.24.0
 
 # back-plt/main.py: 3
-streamlit == 0.73.0
+streamlit == 0.72.0
 
 # back-plt/main.py: 15
-streamlit_ace == 0.0.4
+streamlit_ace == 0.0.3
 
 # back-plt/getData.py: 6,7
 #yahoo_finance_api2 == 0.0.9
