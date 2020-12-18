@@ -19,21 +19,19 @@ pandas == 1.0.5
 requests == 2.24.0
 
 # back-plt/main.py: 3
-streamlit == 0.69.2
+streamlit == 0.73.0
 
 # back-plt/main.py: 15
-streamlit_ace == 0.0.3
+streamlit_ace == 0.0.4
 
 # back-plt/getData.py: 6,7
 #yahoo_finance_api2 == 0.0.9
 
 # back-plt/main.py: 13
-yfinance == 0.1.54
+yfinance == 0.1.55
 
 # Talib
 # ta-lib == 0.4.19
 #Add this one to your app's buildpack list: https://github.com/numrut/heroku-buildpack-python-talib
-
 #It should be placed after heroku/python.
-
 #And remove TA-Lib from your requirements.txt if it is already there.
