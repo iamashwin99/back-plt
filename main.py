@@ -15,7 +15,7 @@ import pandas as pd
 from streamlit_ace import st_ace
 import random, string
 import importlib
-st.beta_set_page_config(page_title='Back-plt', page_icon=None, layout='centered', initial_sidebar_state='auto')
+st.set_page_config(page_title='Back-plt', page_icon=':chart_with_upwards_trend:', layout='wide', initial_sidebar_state='collapsed')
 
 def runStrategy(tickerSymbol,tickerDf,start_cash):
     fname = 'out/' 
@@ -49,7 +49,7 @@ def runStrategy(tickerSymbol,tickerDf,start_cash):
 
 
 THEMES = [
-    "chaos","ambiance",  "chrome", "clouds", "clouds_midnight", "cobalt", "crimson_editor", "dawn",
+    "ambiance", "chaos", "chrome", "clouds", "clouds_midnight", "cobalt", "crimson_editor", "dawn",
     "dracula", "dreamweaver", "eclipse", "github", "gob", "gruvbox", "idle_fingers", "iplastic",
     "katzenmilch", "kr_theme", "kuroir", "merbivore", "merbivore_soft", "mono_industrial", "monokai",
     "nord_dark", "pastel_on_dark", "solarized_dark", "solarized_light", "sqlserver", "terminal",
@@ -58,7 +58,7 @@ THEMES = [
 ]
 
 KEYBINDINGS = [
-    "vscode", "emacs", "sublime", "vim"
+     "emacs", "sublime", "vim" ,"vscode"
 ]
 
 st.write("""
@@ -68,82 +68,95 @@ st.write("""
 * After the chart loads the side bar will load with the backtested data, click on it to download
 """ )
 
-# tickerSymbol =  'RELIANCE.NS'
-# start_date = '2020-09-30'
-# end_date =  '2020-10-18'
-# interval_length = '5m'
-# start_cash =  '100000.0'
+st.write('# Parameters')
+parameters = st.beta_container()
+
+with parameters:
+    display,plot= st.beta_columns(2)
 
 
-tickerSymbol = st.text_input("Enter Symbol (like INFY.NS) ", 'RELIANCE.NS') 
-# start_date = st.text_input("Enter Start Date", '2020-09-20') 
-# end_date = st.text_input("Enter End Date", '2020-10-18') 
-deltaDays = st.text_input("Enter delta days", '30') 
-s_date = st.date_input('Enter Start Date (takes precedence over delta days)', datetime.datetime.now()-datetime.timedelta(days = int(deltaDays)) )
-e_date = st.date_input('Enter End Date', datetime.datetime.now())
+    with display:
+        tickerSymbol = st.text_input("Enter Symbol (like INFY.NS) ", 'RELIANCE.NS') 
+        # start_date = st.text_input("Enter Start Date", '2020-09-20') 
+        # end_date = st.text_input("Enter End Date", '2020-10-18') 
+        deltaDays = st.text_input("Enter delta days", '30') 
+        s_date = st.date_input('Enter Start Date (takes precedence over delta days)', datetime.datetime.now()-datetime.timedelta(days = int(deltaDays)) )
+        e_date = st.date_input('Enter End Date', datetime.datetime.now())
 
-start_date = s_date.strftime("%Y-%m-%d")
-end_date = e_date.strftime("%Y-%m-%d")
+        start_date = s_date.strftime("%Y-%m-%d")
+        end_date = e_date.strftime("%Y-%m-%d")
 
-interval_length = st.selectbox(
-        "Select Interval", options=['1m','2m','5m','15m','30m','60m','90m','1h','1d','5d','1wk','1mo','3mo'], index=2  # pylint: disable=protected-access
-    )
-start_cash = st.text_input("Enter starting Cash", '100000.0') 
-tickerData = yf.Ticker(tickerSymbol)
-#get the historical prices for this ticker
-tickerDf = tickerData.history(interval=interval_length, start=start_date, end=end_date)
-# Open	High	Low	Close	Volume	Dividends	Stock Splits
-#Charting the price and volume
-st.write("""
-## Closing Price
-""")
-st.line_chart(tickerDf.Close)
-st.write("""
-## Volume Price
-""")
-st.line_chart(tickerDf.Volume)
+        interval_length = st.selectbox(
+                "Select Interval", options=['1m','2m','5m','15m','30m','60m','90m','1h','1d','5d','1wk','1mo','3mo'], index=2  # pylint: disable=protected-access
+            )
+        start_cash = st.text_input("Enter starting Cash", '100000.0') 
+        tickerData = yf.Ticker(tickerSymbol)
+        #get the historical prices for this ticker
+        tickerDf = tickerData.history(interval=interval_length, start=start_date, end=end_date)
+        # Open	High	Low	Close	Volume	Dividends	Stock Splits
+        #Charting the price and volume
+    with plot:
+        st.write("""
+        ## Closing Price Plot
+        """)
+        st.line_chart(tickerDf.Close)
+        st.write("""
+        ## Volume Plot
+        """)
+        st.line_chart(tickerDf.Volume)
 
 #load default strategy
+st.write('# Code and Output')
+codenout = st.beta_container()
 
-# Add ace and sliders
-with io.open('strategy.py', 'r', encoding='utf8') as f:
-    text = f.read()
-st.sidebar.title(":memo: Editor settings")
-content = st_ace(
-    value=text,
-    language="python",
-    theme=st.sidebar.selectbox("Theme", options=THEMES),
-    keybinding=st.sidebar.selectbox("Keybinding mode", options=KEYBINDINGS),
-    font_size=st.sidebar.slider("Font size", 5, 24, 12),
-    tab_size=4,
-    show_gutter=st.sidebar.checkbox("Show gutter", value=True),
-    show_print_margin=st.sidebar.checkbox("Show print margin", value=True),
-    wrap=st.sidebar.checkbox("Wrap enabled", value=True),
-    readonly=st.sidebar.checkbox("Read-only", value=False, key="ace-editor"),
-    auto_update=False,
-    key="ace-editor" 
+with codenout:
     
-)
-#save content into temporary py and load its strategy
-strategy_name = 'temp-'+''.join(random.choices(string.ascii_letters + string.digits, k=8)) 
-with open(strategy_name+'.py', 'w') as the_file:
-    the_file.write(content)
+    # Add ace and sliders
+    
+    st.write('### Code editor')
+    with io.open('strategy-default.py', 'r', encoding='utf8') as f:
+        text = f.read()
+    st.sidebar.title(":memo: Editor settings")
+    st.write('Hit `CTRL+ENTER` to retest')
+    st.write('*Remember to save your code separately!*')
+    content = st_ace(
+        height=1000,
+        value=text,
+        language="python",
+        theme=st.sidebar.selectbox("Theme", options=THEMES, index=6),
+        keybinding=st.sidebar.selectbox("Keybinding mode", options=KEYBINDINGS, index=3),
+        font_size=st.sidebar.slider("Font size", 5, 24, 15),
+        tab_size=4,
+        show_gutter=st.sidebar.checkbox("Show gutter", value=True),
+        show_print_margin=st.sidebar.checkbox("Show print margin", value=True),
+        wrap=st.sidebar.checkbox("Wrap enabled", value=True),
+        readonly=st.sidebar.checkbox("Read-only", value=False, key="ace-editor"),
+        auto_update=False,
+        key="ace-editor" 
+        
+    )
+
+    #save content into temporary py and load its strategy
+    strategy_name = 'temp-'+''.join(random.choices(string.ascii_letters + string.digits, k=8)) 
+    with open(strategy_name+'.py', 'w') as the_file:
+        the_file.write(content)
 
 TestStrategy = getattr(importlib.import_module(strategy_name), 'TestStrategy')
 
 ### Run strategy
 file_path,filename = runStrategy(tickerSymbol,tickerDf,start_cash)
-
+st.write(''' ## Backtesting done ''')
 ###Downlaod strategy
 with open(file_path) as f:
-    bytes = f.read()
-    st.components.v1.html(bytes, width=1300, height=2000, scrolling=True)
+    bytes = f.read()    
     b64 = base64.b64encode(bytes.encode("utf-8")).decode()
     href = f'<a href="data:file/html;base64,{b64}" download=\'{filename}.html\'>\
        Click to download \
     </a>'
-st.write(''' ## Backtesting done ''')
+
 st.markdown(href, unsafe_allow_html=True)   
+
+st.components.v1.html(bytes, height=3000, scrolling=False)
 
 
 ## Remove temporary files
