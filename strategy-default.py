@@ -13,9 +13,7 @@ import pandas as pd
 import streamlit as st
 
 # Create a Stratey
-
 # Actual logic is implimneted at def next:
-
 class TestStrategy(bt.Strategy):
     params = (('p1', 8), 
     ('p2', 21),

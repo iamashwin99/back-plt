@@ -6,6 +6,7 @@ import datetime  # For datetime objects
 import os  # To manage paths
 import io
 import backtrader as bt
+import time
 #from strategy import TestStrategy
 from btplotting import BacktraderPlotting
 from btplotting.schemes import Tradimo
@@ -76,8 +77,6 @@ display,plot= st.beta_columns(2)
 
 with display:
     tickerSymbol = st.text_input("Enter Symbol (like INFY.NS) ", 'RELIANCE.NS') 
-    # start_date = st.text_input("Enter Start Date", '2020-09-20') 
-    # end_date = st.text_input("Enter End Date", '2020-10-18') 
     deltaDays = st.text_input("Enter delta days", '30') 
     s_date = st.date_input('Enter Start Date (takes precedence over delta days)', datetime.datetime.now()-datetime.timedelta(days = int(deltaDays)) )
     e_date = st.date_input('Enter End Date', datetime.datetime.now())
@@ -86,14 +85,12 @@ with display:
     end_date = e_date.strftime("%Y-%m-%d")
 
     interval_length = st.selectbox(
-            "Select Interval", options=['1m','2m','5m','15m','30m','60m','90m','1h','1d','5d','1wk','1mo','3mo'], index=2  # pylint: disable=protected-access
+            "Select Interval", options=['1m','2m','5m','15m','30m','60m','90m','1h','1d','5d','1wk','1mo','3mo'], index=2  
         )
     start_cash = st.text_input("Enter starting Cash", '100000.0') 
     tickerData = yf.Ticker(tickerSymbol)
-    #get the historical prices for this ticker
     tickerDf = tickerData.history(interval=interval_length, start=start_date, end=end_date)
-    # Open	High	Low	Close	Volume	Dividends	Stock Splits
-    #Charting the price and volume
+
 with plot:
     st.write("""
     ## Closing Price Plot
@@ -111,6 +108,7 @@ st.write('# Code and Output')
 
 
 # Add ace and sliders
+
 
 st.write('### Code editor')
 with io.open('strategy-default.py', 'r', encoding='utf8') as f:
