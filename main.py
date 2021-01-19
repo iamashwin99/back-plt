@@ -135,7 +135,7 @@ content = st_ace(
 
 #save content into temporary py and load its strategy
 strategy_name = 'temp-'+''.join(random.choices(string.ascii_letters + string.digits, k=8)) 
-with open(strategy_name+'.py', 'w') as the_file:
+with open(strategy_name+'.py', 'w',encoding="utf-8") as the_file:
     the_file.write(content)
 
 TestStrategy = getattr(importlib.import_module(strategy_name), 'TestStrategy')
@@ -144,7 +144,7 @@ TestStrategy = getattr(importlib.import_module(strategy_name), 'TestStrategy')
 file_path,filename = runStrategy(tickerSymbol,tickerDf,start_cash)
 st.write(''' ## Backtesting done ''')
 ###Downlaod strategy
-with open(file_path) as f:
+with open(file_path,encoding="utf-8") as f:
     bytes = f.read()    
     b64 = base64.b64encode(bytes.encode("utf-8")).decode()
     href = f'<a href="data:file/html;base64,{b64}" download=\'{filename}.html\'>\
