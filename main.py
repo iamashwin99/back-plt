@@ -75,31 +75,31 @@ st.write('# Parameters')
 display,plot= st.beta_columns(2)
 
 
-with display:
-    tickerSymbol = st.text_input("Enter Symbol (like INFY.NS) ", 'RELIANCE.NS') 
-    deltaDays = st.text_input("Enter delta days", '30') 
-    s_date = st.date_input('Enter Start Date (takes precedence over delta days)', datetime.datetime.now()-datetime.timedelta(days = int(deltaDays)) )
-    e_date = st.date_input('Enter End Date', datetime.datetime.now())
+#with display:
+tickerSymbol = st.text_input("Enter Symbol (like INFY.NS) ", 'RELIANCE.NS') 
+deltaDays = st.text_input("Enter delta days", '30') 
+s_date = st.date_input('Enter Start Date (takes precedence over delta days)', datetime.datetime.now()-datetime.timedelta(days = int(deltaDays)) )
+e_date = st.date_input('Enter End Date', datetime.datetime.now())
 
-    start_date = s_date.strftime("%Y-%m-%d")
-    end_date = e_date.strftime("%Y-%m-%d")
+start_date = s_date.strftime("%Y-%m-%d")
+end_date = e_date.strftime("%Y-%m-%d")
 
-    interval_length = st.selectbox(
-            "Select Interval", options=['1m','2m','5m','15m','30m','60m','90m','1h','1d','5d','1wk','1mo','3mo'], index=2  
-        )
-    start_cash = st.text_input("Enter starting Cash", '100000.0') 
-    tickerData = yf.Ticker(tickerSymbol)
-    tickerDf = tickerData.history(interval=interval_length, start=start_date, end=end_date)
+interval_length = st.selectbox(
+        "Select Interval", options=['1m','2m','5m','15m','30m','60m','90m','1h','1d','5d','1wk','1mo','3mo'], index=2  
+    )
+start_cash = st.text_input("Enter starting Cash", '100000.0') 
+tickerData = yf.Ticker(tickerSymbol)
+tickerDf = tickerData.history(interval=interval_length, start=start_date, end=end_date)
 
-with plot:
-    st.write("""
-    ## Closing Price Plot
-    """)
-    st.line_chart(tickerDf.Close)
-    st.write("""
-    ## Volume Plot
-    """)
-    st.line_chart(tickerDf.Volume)
+#with plot:
+st.write("""
+## Closing Price Plot
+""")
+st.line_chart(tickerDf.Close)
+st.write("""
+## Volume Plot
+""")
+st.line_chart(tickerDf.Volume)
 
 #load default strategy
 st.write('# Code and Output')
@@ -132,7 +132,7 @@ content = st_ace(
     key="ace-editor" 
     
 )
-
+time.sleep(10)
 #save content into temporary py and load its strategy
 strategy_name = 'temp-'+''.join(random.choices(string.ascii_letters + string.digits, k=8)) 
 with open(strategy_name+'.py', 'w',encoding="utf-8") as the_file:
