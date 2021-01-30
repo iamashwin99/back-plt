@@ -72,7 +72,7 @@ st.write("""
 st.write('# Parameters')
 
 
-display,plot= st.beta_columns(2)
+#display,plot= st.beta_columns(2)
 
 
 #with display:
