@@ -16,10 +16,10 @@ pandas == 1.0.5
 #pyngrok == 4.2.2
 
 # back-plt/getData.py: 11
-requests == 2.26.0
+requests == 2.31.0
 
 # back-plt/main.py: 3
-streamlit == 0.72.0
+streamlit == 1.11.1
 
 # back-plt/main.py: 15
 streamlit_ace == 0.0.3
